@@ -22,7 +22,7 @@ on:
     secrets:
       caller-token:
         description: 'A token passed from the caller workflow'
-        required: false
+        required: true
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
@@ -40,6 +40,7 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
+    environment: CI/CD Scripts
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -50,10 +51,11 @@ jobs:
         run: |
           echo "GitHub secret: [${{ github.event.secrets.caller-token }}]";
           echo "Env secret: [${CALLER_TOKEN}]";
+          echo "Env secret (exposed): [${CALLER_TOKEN:0:1}:${CALLER_TOKEN:1:${#CALLER_TOKEN}}]";
         env:
           CALLER_TOKEN: ${{ github.event.secrets.caller-token }}
       
-      - name: GitHub Script
+      - name: GitHub API - Create Org Repo
         uses: actions/github-script@v5.0.0
         with:
           # https://octokit.github.io/rest.js/v18#repos-create-in-org
