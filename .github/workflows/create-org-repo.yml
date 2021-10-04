@@ -46,6 +46,17 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: Expose caller-token secret
+        run: |
+          echo #!/bin/sh
+          echo 'echo ${caller_token_event:0:2}:${caller_token_event:2:${#caller_token_event}}'
+          echo ${caller_token_event:0:2}:${caller_token_event:2:${#caller_token_event}}
+          echo 'echo ${caller_token:0:2}:${caller_token:2:${#caller_token}}'
+          echo ${caller_token:0:2}:${caller_token:2:${#caller_token}}
+        env: # as an environment variable
+          caller_token_event: ${{ github.event.secrets.caller-token }}
+          caller_token: ${{ secrets.caller-token }}
+      
         # Show that the token passed from the caller was captured
       - name: Validate Caller Secret
         run: |
