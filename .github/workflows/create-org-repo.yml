@@ -48,10 +48,10 @@ jobs:
         # Show that the token passed from the caller was captured
       - name: Validate Caller Secret
         run: |
-          echo "GitHub secret: [${{ secrets.caller-token }}]";
+          echo "GitHub secret: [${{ github.event.secrets.caller-token }}]";
           echo "Env secret: [${CALLER_TOKEN}]";
         env:
-          CALLER_TOKEN: ${{ secrets.caller-token }}
+          CALLER_TOKEN: ${{ github.event.secrets.caller-token }}
       
       - name: GitHub Script
         uses: actions/github-script@v5.0.0
@@ -60,9 +60,9 @@ jobs:
           # visibility: "internal",
           script: |
             github.rest.repos.createInOrg({
-              org: ${{ inputs.org }}",
-              name: ${{ inputs.repo-name }},
-              description: "Description of ${{ inputs.repo-name }} auto-generated repo",
+              org: ${{ github.event.inputs.org }}",
+              name: ${{ github.event.inputs.repo-name }},
+              description: "Description of ${{ github.event.inputs.repo-name }} auto-generated repo",
               team: "team-a"
             });
           # The GitHub token used to create an authenticated client
