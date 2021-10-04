@@ -10,7 +10,7 @@ on:
       username:
         description: 'A username passed from the caller workflow'
         required: true
-        type: string
+        type: string  # Can be: [boolean,number,string]
       org:
         description: 'Org to create the repo in'
         required: true
@@ -20,19 +20,21 @@ on:
         required: true
         type: string
     secrets:
-      access-token:
+      caller-token:
         description: 'A token passed from the caller workflow'
         required: false
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
-      logLevel:
-        description: 'Log level'     
-        required: false
-        default: 'warning'
-      tags:
-        description: 'Test scenario tags'
-        required: false
+      username:
+        description: 'A username passed from the caller workflow'
+        required: true
+      org:
+        description: 'Org to create the repo in'
+        required: true
+      repo-name:
+        description: 'Name of the repo to create'
+        required: true
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -43,6 +45,14 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+        # Show that the token passed from the caller was captured
+      - name: Validate Caller Secret
+        run: |
+          echo "GitHub secret: [${{ secrets.caller-token }}]";
+          echo "Env secret: [${CALLER_TOKEN}]";
+        env:
+          CALLER_TOKEN: ${{ secrets.caller-token }}
+      
       - name: GitHub Script
         uses: actions/github-script@v5.0.0
         with:
@@ -56,7 +66,7 @@ jobs:
               team: "team-a"
             });
           # The GitHub token used to create an authenticated client
-          github-token: ${{ secrets.CICDSCRIPTS_ORG_TOKEN }}
+          github-token: ${{ secrets.ORG_TOKEN }}
           # Whether to tell the GitHub client to log details of its requests
           debug: true
           # An optional user-agent string
