@@ -40,7 +40,7 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   create-org-repo:
-    environment: CI/CD Scripts
+    environment: ${{ github.event.inputs.org }}
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -59,13 +59,12 @@ jobs:
         uses: actions/github-script@v5.0.0
         with:
           # https://octokit.github.io/rest.js/v18#repos-create-in-org
-          # visibility: "internal",
+          # visibility: "internal", team: "team-a"
           script: |
             github.rest.repos.createInOrg({
               org: ${{ github.event.inputs.org }}",
               name: ${{ github.event.inputs.repo-name }},
-              description: "Description of ${{ github.event.inputs.repo-name }} auto-generated repo",
-              team: "team-a"
+              description: "Description of ${{ github.event.inputs.repo-name }} auto-generated repo"
             });
           # The GitHub token used to create an authenticated client
           github-token: ${{ secrets.ORG_TOKEN }}
