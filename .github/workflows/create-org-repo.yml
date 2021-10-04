@@ -62,7 +62,7 @@ jobs:
           # visibility: "internal", team: "team-a"
           script: |
             github.rest.repos.createInOrg({
-              org: ${{ github.event.inputs.org }}",
+              org: ${{ github.event.inputs.org }},
               name: ${{ github.event.inputs.repo-name }},
               description: "Description of ${{ github.event.inputs.repo-name }} auto-generated repo"
             });
