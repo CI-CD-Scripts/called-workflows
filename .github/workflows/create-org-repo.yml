@@ -1,0 +1,67 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Create Org Repo
+
+# Controls when the workflow will run
+on:
+  # Allows you to reuse this workflow from other workflows
+  workflow_call:
+    inputs:
+      username:
+        description: 'A username passed from the caller workflow'
+        required: true
+        type: string
+      org:
+        description: 'Org to create the repo in'
+        required: true
+        type: string
+      repo-name:
+        description: 'Name of the repo to create'
+        required: true
+        type: string
+    secrets:
+      access-token:
+        description: 'A token passed from the caller workflow'
+        required: false
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'Log level'     
+        required: false
+        default: 'warning'
+      tags:
+        description: 'Test scenario tags'
+        required: false
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: GitHub Script
+        uses: actions/github-script@v5.0.0
+        with:
+          # https://octokit.github.io/rest.js/v18#repos-create-in-org
+          # visibility: "internal",
+          script: |
+            github.rest.repos.createInOrg({
+              org: ${{ inputs.org }}",
+              name: ${{ inputs.repo-name }},
+              description: "Description of ${{ inputs.repo-name }} auto-generated repo",
+              team: "team-a"
+            });
+          # The GitHub token used to create an authenticated client
+          github-token: ${{ secrets.CICDSCRIPTS_ORG_TOKEN }}
+          # Whether to tell the GitHub client to log details of its requests
+          debug: true
+          # An optional user-agent string
+#           user-agent: # optional, default is actions/github-script
+          # A comma-separated list of API previews to accept
+#           previews: # optional
+          # Either "string" or "json" (default "json")—how the result will be encoded
+#           result-encoding: # optional, default is json
