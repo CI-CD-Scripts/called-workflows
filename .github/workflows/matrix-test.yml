@@ -83,7 +83,7 @@ jobs:
   # Uses the previous job's json variable output as the matrix input
   passed-matrix:
     runs-on: ubuntu-latest
-    needs: dispatch-input
+    needs: setup-matrix
     strategy:
       matrix: ${{ fromJson(needs.dispatch-input.outputs.matrix) }}
     steps:
