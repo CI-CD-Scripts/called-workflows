@@ -1,0 +1,90 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Matrix Test
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Allows you to reuse this workflow from other workflows
+  workflow_call:
+    inputs:
+      test:
+        description: 'Used in dispatch-input job'
+        required: true
+        type: string  # Can be: [boolean,number,string]
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      test:
+        description: 'Used in dispatch-input job'
+        required: true
+
+jobs:
+  nested-loop:
+    name: Nested Loop (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        # 2*3+1 = 7 jobs
+        os: [ubuntu-18.04, ubuntu-20.04]
+        node: [10, 12, 14]
+        include:
+          - os: ubuntu-20.04
+            node: 16
+            test: anything
+    steps:
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node }}
+
+
+  multi-env-specific-vars:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+       include:
+         - node-version: 10.x
+           env: "prod"
+           datacenter: "site-a"
+         - node-version: 12.x
+           env: "dev"
+           datacenter: "site-b"
+    steps:
+      - name: Echo site details
+        env:
+          ENV: ${{ matrix.env }}
+          DATACENTER: ${{ matrix.datacenter }}
+          NODE_VERSION: ${{ matrix.node-version }}
+        run: echo Site:[$ENV] Datacenter:[$DATACENTER] Node Version:[$NODE_VERSION]
+
+
+  dispatch-input:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: 
+        test: ["${{ github.event.inputs.test }}", 1]
+    steps:
+      - name: Echo input & static vars
+        run: echo ${{ matrix.test }}
+
+  # Set a json variable used by the next job
+  setup-matrix:
+    runs-on: ubuntu-latest
+    steps:
+        # here we create the json, we need the "id:" so we can use it in "outputs" bellow
+      - id: set-matrix
+        run: echo "::set-output name=matrix::{\"include\":[{\"project\":\"foo\",\"config\":\"Debug\"},{\"project\":\"bar\",\"config\":\"Release\"}]}"
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+  # Uses the previous job's json variable output as the matrix input
+  passed-matrix:
+    runs-on: ubuntu-latest
+    needs: dispatch-input
+    strategy:
+      matrix: ${{ fromJson(needs.dispatch-input.outputs.matrix) }}
+    steps:
+      - run: echo Project:[${{ matrix.project }}] Config:[${{ matrix.config }}]    
