@@ -46,6 +46,19 @@ jobs:
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
+      - name: List Repo Secrets
+        uses: actions/github-script@v5.0.0
+        with:
+          # https://octokit.github.io/rest.js/v18#actions-list-artifacts-for-repo
+          # https://docs.github.com/en/actions/learn-github-actions/contexts
+          script: |
+            github.rest.actions.listRepoSecrets({
+              owner: "${{ github.repository_owner }}",
+              repo: "${{ github.event.repository.name }}"
+            });
+#           github-token: ${{ secrets.ORG_TOKEN }}
+          debug: true
+    
         # Show that the token passed from the caller was captured
       - name: Validate Caller Secret
         run: |
