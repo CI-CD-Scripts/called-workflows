@@ -60,7 +60,7 @@ jobs:
             try {
               await github.rest.repos.update({
                 owner: context.payload.organization.login,
-                private: true,
+                private: false,
                 repo: newRepo,
                 has_issues: enableIssue,
                 has_projects: enableProject,
