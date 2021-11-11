@@ -6,7 +6,7 @@ assignees:
 - KevinMSampson
 body:
 - type: input
-  id: repo_name
+  id: repo-name
   attributes:
     label: Repo name
     description: "Name of the new repo"
@@ -20,9 +20,9 @@ body:
     description: What is the repo's visibility?
     multiple: false
     options:
-      - label: public
-      - label: private
-      - label: internal
+      - public
+      - private
+#       - internal
   validations:
     required: true
 - type: checkboxes
