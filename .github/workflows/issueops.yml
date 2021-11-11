@@ -7,6 +7,7 @@ on:
 jobs:
   Create-Repo:
     runs-on: ubuntu-latest
+    environment: ci-cd-scripts
     if: contains(github.event.issue.labels.*.name, 'issueops')
     steps:
         
@@ -21,6 +22,8 @@ jobs:
         with:
           github-token: ${{ secrets.CUSTOM_TOKEN }}
           script: |
+            console.log("Print github.event:")
+            console.log(github.event)
             
             bodySplit = context.payload.issue.body.split("\n")
             console.log("New repository name: " + bodySplit[2])
