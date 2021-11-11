@@ -1,14 +1,9 @@
----
 name: Create new repo
-about: 'Use #issueops to create a new repo in this org'
+description: 'Use #issueops to create a new repo in this org'
 title: Create new repo
 labels: issueops
-assignees: ''
-
----
-
-Fill out the form & submit to create a new repo!
----
+assignees:
+- KevinMSampson
 body:
 - type: input
   id: repo_name
