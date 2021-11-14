@@ -34,10 +34,10 @@ on:
         description: 'Enable Repo Forking?'
         required: true
         type: boolean
-#     secrets:
-#       caller-token:
-#         description: 'A token passed from the caller workflow'
-#         required: true
+    secrets:
+      caller-token:
+        description: 'A token passed from the caller workflow'
+        required: true
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
@@ -79,7 +79,7 @@ jobs:
       - name: Configure GitHub repo
         uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.CUSTOM_TOKEN }}
+          github-token: ${{ secrets.caller-token }}
           script: |
             let teams = "org-admin,org-read,${{ github.event.inputs.enableIssue }}".toLowerCase().replaceAll(' ','-')
             let enableIssue = ${{ github.event.inputs.enableIssue }} || false
