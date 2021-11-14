@@ -2,7 +2,6 @@ name: Create repositories using IssueOps
 description: This IssueOps takes the input from an user to create a repository based on Template Repository and safe settings
 title: "[IssueOps]: "
 labels: ["issueops", "issueops: new-repo"]
-milestone: 1
 assignees:
   - KevinMSampson
 body:
@@ -10,16 +9,18 @@ body:
     attributes:
       value: |
         Thanks for taking the time to fill out this report!
+        
   - type: input
-    id: new-repository
+    id: repo-name
     attributes:
       label: New Repository Name
       description: Type in the name of your new repository that applies the following permission
       placeholder: ex. new-repository
     validations:
       required: true
+      
   - type: dropdown
-    id: template-repository
+    id: repo-template
     attributes:
       label: Template Repository
       description: Select Template Repository that you want to use
@@ -27,8 +28,9 @@ body:
         - sample-template-repository-universe
     validations:
       required: true
+      
   - type: input
-    id: team
+    id: team-slug
     attributes:
       label: Team Permission
       description: Type in the team that you want to apply the admin permission
