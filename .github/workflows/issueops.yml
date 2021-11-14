@@ -8,7 +8,10 @@ jobs:
   Create-Repo:
     runs-on: ubuntu-latest
     environment: ci-cd-scripts
-    if: contains(github.event.issue.labels.*.name, 'issueops')
+    if: contains(github.event.issue.labels.*.name, 'issueops:new-repo')
+    env:
+      # ID of Milestone to group the issue in
+      MILESTONE: 1
     steps:
         
       - name: Print Context
@@ -22,9 +25,6 @@ jobs:
         with:
           github-token: ${{ secrets.CUSTOM_TOKEN }}
           script: |
-            console.log("Print github.event:")
-            console.log(github.event)
-            
             bodySplit = context.payload.issue.body.split("\n")
             console.log("New repository name: " + bodySplit[2])
             console.log("Template Repository: " + bodySplit[6])
@@ -43,6 +43,31 @@ jobs:
             
             console.log("New repo: " + newRepo + " Template Repo: " + templateRepo + " Teams: " + teams)
             
+            console.log("Commenting on issue '" + context.payload.issue.title + "' - " + context.payload.issue.html_url)
+            try { 
+              await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '[' + context.workflow + ' #' + context.runNumber + '](' + context.payload.repository.html_url + '/actions/runs/' + context.runId + ') has picked up this issue'
+             }) 
+            } catch(err) {
+                throw err
+            }
+            
+            console.log("Adding issue to Milestone [${{ env.MILESTONE }}]")
+            try {
+              await github.rest.issues.update({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              milestone: ${{ env.MILESTONE }}
+             }) 
+            } catch(err) {
+                throw err
+            }
+            
+            console.log("Creating repo from template")
             try {
               await github.rest.repos.createUsingTemplate({
                 template_owner: context.payload.organization.login,
@@ -57,6 +82,7 @@ jobs:
                 throw err 
             }
             
+            console.log("Configuring repo")
             try {
               await github.rest.repos.update({
                 owner: context.payload.organization.login,
@@ -70,6 +96,7 @@ jobs:
                 throw err 
             }
             
+            console.log("Updating repo branch permissions")
             try {
               await github.rest.repos.updateBranchProtection({
                 "owner": context.payload.organization.login,
@@ -84,6 +111,7 @@ jobs:
                 throw err 
             }
             
+            console.log("Setting Team repo permissions")
             try {
               await github.rest.teams.addOrUpdateRepoPermissionsInOrg({
                 org: context.payload.organization.login,
@@ -96,12 +124,25 @@ jobs:
                 throw err 
             }
             
+            console.log("Commenting on issue '" + context.payload.issue.title + "' - " + context.payload.issue.html_url)
             try { 
               await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
               body: 'Thanks for creating a repo. Your new repo is available at: https://github.com/' + context.payload.organization.login + "/" + newRepo
+             }) 
+            } catch(err) {
+                throw err
+            }
+            
+            console.log("Closing issue")
+            try {
+              await github.rest.issues.update({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed'
              }) 
             } catch(err) {
                 throw err
