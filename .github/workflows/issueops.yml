@@ -161,15 +161,14 @@ jobs:
 
   # https://docs.github.com/en/actions/learn-github-actions/reusing-workflows
   Configure-Repo:
-    needs: Create-Repo
     uses: ci-cd-scripts/called-workflows/.github/workflows/configure-repo.yml@main
     with:
-      org: ${{ steps.create-github-repo.outputs.org }}
-      repo-name: ${{ steps.create-github-repo.outputs.newRepo }}
-      teams: ${{ steps.create-github-repo.outputs.teams }}
-      enableIssue: ${{ steps.create-github-repo.outputs.enableIssue }}
-      enableProject: ${{ steps.create-github-repo.outputs.enableProject }}
-      enableSquashMerge: ${{ steps.create-github-repo.outputs.enableSquashMerge }}
-      enableForking: ${{ steps.create-github-repo.outputs.enableForking }}
+      org: ${{ jobs.Create-Repo.steps.create-github-repo.outputs.org }}
+      repo-name: ${{ jobs.Create-Repo.steps.create-github-repo.outputs.newRepo }}
+      teams: ${{jobs.Create-Repo.steps.create-github-repo.outputs.teams }}
+      enableIssue: ${{ jobs.Create-Repo.steps.create-github-repo.outputs.enableIssue }}
+      enableProject: ${{ jobs.Create-Repo.steps.create-github-repo.outputs.enableProject }}
+      enableSquashMerge: ${{ jobs.Create-Repo.steps.create-github-repo.outputs.enableSquashMerge }}
+      enableForking: ${{ jobs.Create-Repo.steps.create-github-repo.outputs.enableForking }}
     secrets:
       caller-token: ${{ secrets.ORG_TOKEN }}
