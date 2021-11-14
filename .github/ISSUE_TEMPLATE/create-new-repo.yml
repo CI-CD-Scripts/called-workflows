@@ -2,6 +2,7 @@ name: Create repositories using IssueOps
 description: This IssueOps takes the input from an user to create a repository based on Template Repository and safe settings
 title: "[IssueOps]: "
 labels: ["issueops", "issueops: new-repo"]
+milestone: 1
 assignees:
   - KevinMSampson
 body:
