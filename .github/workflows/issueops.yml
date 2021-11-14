@@ -20,12 +20,30 @@ jobs:
           script: |
             console.log(context)
             
-      - name: Create GitHub repo
+      - name: Create GitHub Repo
+        id: create-github-repo
         uses: actions/github-script@v5
         with:
           github-token: ${{ secrets.CUSTOM_TOKEN }}
           script: |
             bodySplit = context.payload.issue.body.split("\n")
+            # Set vars for this step
+            let newRepo = bodySplit[2]
+            let templateRepo = bodySplit[6]
+            let teams = bodySplit[10]
+            let enableIssue = bodySplit[14].includes("X")
+            let enableProject = bodySplit[18].includes("X")
+            let enableSquashMerge = bodySplit[22].includes("X")
+            let enableForking = bodySplit[26].includes("X")
+            # Set vars for subsequent steps
+            core.setOutput('newRepo', newRepo);
+            core.setOutput('org', context.payload.organization.login);
+            core.setOutput('teams', teams);
+            core.setOutput('enableIssue', enableIssue);
+            core.setOutput('enableProject', enableProject);
+            core.setOutput('enableSquashMerge', enableSquashMerge);
+            core.setOutput('enableForking', enableForking);
+            # Print vars to the log
             console.log("New repository name: " + bodySplit[2])
             console.log("Template Repository: " + bodySplit[6])
             console.log("Team: " + bodySplit[10])
@@ -33,13 +51,6 @@ jobs:
             console.log("Enable Project: " +  bodySplit[18].includes("X"))
             console.log("Allow Squash Merge: " +  bodySplit[22].includes("X"))
             console.log("Allow Forking: " +  bodySplit[26].includes("X"))
-            let newRepo = bodySplit[2]
-            let templateRepo = bodySplit[6]
-            let teams = bodySplit[10].split(",")
-            let enableIssue = bodySplit[14].includes("X")
-            let enableProject = bodySplit[18].includes("X")
-            let enableSquashMerge = bodySplit[22].includes("X")
-            let enableForking = bodySplit[26].includes("X")
             
             console.log("New repo: " + newRepo + " Template Repo: " + templateRepo + " Teams: " + teams)
             
@@ -52,7 +63,7 @@ jobs:
               body: 'Workflow [' + context.workflow + ' #' + context.runNumber + '](' + context.payload.repository.html_url + '/actions/runs/' + context.runId + ') has picked up this issue'
              }) 
             } catch(err) {
-                throw err
+              core.setFailed(`Action failed with error ${err}`);
             }
             
             console.log("Adding issue to Milestone [${{ env.MILESTONE }}]")
@@ -64,7 +75,7 @@ jobs:
               milestone: ${{ env.MILESTONE }}
              }) 
             } catch(err) {
-                throw err
+              core.setFailed(`Action failed with error ${err}`);
             }
             
             console.log("Creating repo from template")
@@ -79,7 +90,7 @@ jobs:
                 private: false
               })
             } catch(err) {
-                throw err 
+              core.setFailed(`Action failed with error ${err}`);
             }
             
 #            console.log("Configuring repo")
@@ -93,7 +104,7 @@ jobs:
 #                allow_squash_merge: enableSquashMerge
 #              })
 #            } catch(err) {
-#                throw err 
+#              core.setFailed(`Action failed with error ${err}`);
 #            }
 #            
 #            console.log("Updating repo branch permissions")
@@ -108,7 +119,7 @@ jobs:
 #                "restrictions" : { "users": [], "teams": [], "apps": [] }
 #              })
 #            } catch(err) {
-#                throw err 
+#              core.setFailed(`Action failed with error ${err}`);
 #            }
 #            
 #            console.log("Setting Team repo permissions")
@@ -121,7 +132,7 @@ jobs:
 #                permission: 'admin'
 #              })
 #            } catch(err) {
-#                throw err 
+#              core.setFailed(`Action failed with error ${err}`);
 #            }
 #            
 #            console.log("Commenting on issue '" + context.payload.issue.title + "' - " + context.payload.issue.html_url)
@@ -133,7 +144,7 @@ jobs:
 #              body: 'Thanks for creating a repo. Your new repo is available at: https://github.com/' + context.payload.organization.login + "/" + newRepo
 #             }) 
 #            } catch(err) {
-#                throw err
+#              core.setFailed(`Action failed with error ${err}`);
 #            }
 #            
 #            console.log("Closing issue")
@@ -145,12 +156,19 @@ jobs:
 #              state: 'closed'
 #             }) 
 #            } catch(err) {
-#                throw err
+#              core.setFailed(`Action failed with error ${err}`);
 #            }
 
+  # https://docs.github.com/en/actions/learn-github-actions/reusing-workflows
   Configure-Repo:
-    uses: .github/workflows/configure-repo.yml@main
+    uses: ci-cd-scripts/called-workflows/.github/workflows/configure-repo.yml@main
     with:
-      inputs:
-        teams: teams
-        enableIssue: enableIssue
+      org: ${{ steps.create-github-repo.outputs.org }}
+      repo-name: ${{ steps.create-github-repo.outputs.newRepo }}
+      teams: ${{ steps.create-github-repo.outputs.teams }}
+      enableIssue: ${{ steps.create-github-repo.outputs.enableIssue }}
+      enableProject: ${{ steps.create-github-repo.outputs.enableProject }}
+      enableSquashMerge: ${{ steps.create-github-repo.outputs.enableSquashMerge }}
+      enableForking: ${{ steps.create-github-repo.outputs.enableForking }}
+    secrets:
+      caller-token: ${{ secrets.TOKEN }}
