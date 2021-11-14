@@ -24,7 +24,7 @@ jobs:
         id: create-github-repo
         uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.CUSTOM_TOKEN }}
+          github-token: ${{ secrets.ORG_TOKEN }}
           script: |
             bodySplit = context.payload.issue.body.split("\n")
             # Set vars for this step
@@ -161,6 +161,7 @@ jobs:
 
   # https://docs.github.com/en/actions/learn-github-actions/reusing-workflows
   Configure-Repo:
+    needs: Create-Repo
     uses: ci-cd-scripts/called-workflows/.github/workflows/configure-repo.yml@main
     with:
       org: ${{ steps.create-github-repo.outputs.org }}
@@ -171,4 +172,4 @@ jobs:
       enableSquashMerge: ${{ steps.create-github-repo.outputs.enableSquashMerge }}
       enableForking: ${{ steps.create-github-repo.outputs.enableForking }}
     secrets:
-      caller-token: ${{ secrets.TOKEN }}
+      caller-token: ${{ secrets.ORG_TOKEN }}
