@@ -1,0 +1,163 @@
+# https://github.com/githubuniverseworkshops/GitHub-Actions-Planet-GitHubUniverse2021
+name: Configure repository
+
+on:
+  # Allows you to reuse this workflow from other workflows
+  workflow_call:
+    inputs:
+      teams:
+        description: 'Comma-separated list of team-slugs'
+        required: true
+        default: org-admin
+        type: string  # Can be: [boolean,number,string]
+      enableIssue:
+        description: 'Enable Repo Issues?'
+        required: true
+        type: boolean
+      enableProject:
+        description: 'Enable Repo Projects?'
+        required: true
+        type: boolean
+      enableSquashMerge:
+        description: 'Enable Repo Squash Merging?'
+        required: true
+        type: boolean
+      enableForking:
+        description: 'Enable Repo Forking?'
+        required: true
+        type: boolean
+    secrets:
+      caller-token:
+        description: 'A token passed from the caller workflow'
+        required: true
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      teams:
+        description: 'Comma-separated list of team-slugs'
+        required: true
+        default: org-admin
+      enableIssue:
+        description: 'Enable Repo Issues?'
+        required: true
+        type: boolean
+      enableProject:
+        description: 'Org to create the repo in'
+        required: true
+        type: boolean
+      enableSquashMerge:
+        description: 'Name of the repo to create'
+        required: true
+        type: boolean
+      enableForking:
+        description: 'Name of the repo to create'
+        required: true
+        type: boolean
+
+jobs:
+  Configure-Repo:
+    runs-on: ubuntu-latest
+    environment: ci-cd-scripts
+    steps:
+        
+      - name: Print Context
+        uses: actions/github-script@v5
+        with:
+          script: |
+            console.log(context)
+            
+      - name: Configure GitHub repo
+        uses: actions/github-script@v5
+        with:
+          github-token: ${{ secrets.CUSTOM_TOKEN }}
+          script: |
+            let teams = "org-admin,org-read,${{ github.event.inputs.enableIssue }}".toLowerCase().replaceAll(' ','-')
+            let enableIssue = ${{ github.event.inputs.enableIssue }} || false
+            let enableProject = ${{ github.event.inputs.enableProject }} || false
+            let enableSquashMerge = ${{ github.event.inputs.enableSquashMerge }} || false
+            let enableForking = ${{ github.event.inputs.enableForking }} || false
+            console.log("Team: " + teams)
+            console.log("Enable Issue: " + enableIssue)
+            console.log("Enable Project: " + enableProject)
+            console.log("Allow Squash Merge: " + enableSquashMerge)
+            console.log("Allow Forking: " + enableForking)
+            
+            console.log("Configuring repo")
+            try {
+              await github.rest.repos.update({
+                owner: context.payload.organization.login,
+                private: false,
+                repo: newRepo,
+                has_issues: enableIssue,
+                has_projects: enableProject,
+                allow_squash_merge: enableSquashMerge
+              })
+            } catch(err) {
+                throw err 
+            }
+            
+            console.log("Updating repo branch permissions")
+            try {
+              await github.rest.repos.updateBranchProtection({
+                "owner": context.payload.organization.login,
+                "repo": newRepo,
+                "branch": 'main',
+                "required_status_checks": { "strict": true, "contexts": [] },
+                "enforce_admins": true,
+                "required_pull_request_reviews": {"dismissal_restrictions": {"users":[], "teams":[]}, "dismiss_stale_reviews": false, "require_code_owner_reviews": true, "required_approving_review_count": 1},
+                "restrictions" : { "users": [], "teams": [], "apps": [] }
+              })
+            } catch(err) {
+                throw err 
+            }
+            
+            console.log("Setting Team repo permissions")
+            for await (const team of teams.split(",") {
+              if (team.includes('admin')) {
+                let permission = 'admin'
+              } else if (team.includes('maintain')) {
+                let permission = 'maintain'
+              } else if (team.includes('write')) {
+                let permission = 'write'
+              } else if (team.includes('triage')) {
+                let permission = 'triage'
+              } else {
+                let permission = 'read'
+              }
+              try {
+                await github.rest.teams.addOrUpdateRepoPermissionsInOrg({
+                  org: context.payload.organization.login,
+                  owner: context.payload.organization.login,
+                  repo: newRepo,
+                  team_slug: team,
+                  permission: permission
+                })
+              } catch(err) {
+                  throw err 
+              }
+            }
+            
+            console.log("Commenting on issue '" + context.payload.issue.title + "' - " + context.payload.issue.html_url)
+            try { 
+              await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'Thanks for creating a repo. Your new repo is available at: https://github.com/' + context.payload.organization.login + "/" + newRepo
+             }) 
+            } catch(err) {
+                throw err
+            }
+            
+            console.log("Closing issue")
+            try {
+              await github.rest.issues.update({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'closed'
+             }) 
+            } catch(err) {
+                throw err
+            }
+            
