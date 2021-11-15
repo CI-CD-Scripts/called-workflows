@@ -82,10 +82,10 @@ jobs:
           github-token: ${{ secrets.caller-token }}
           script: |
             let teams = "org-admin,org-read,${{ github.event.inputs.enableIssue }}".toLowerCase().replaceAll(' ','-')
-            let enableIssue = ${{ github.event.inputs.enableIssue }} || false
-            let enableProject = ${{ github.event.inputs.enableProject }} || false
-            let enableSquashMerge = ${{ github.event.inputs.enableSquashMerge }} || false
-            let enableForking = ${{ github.event.inputs.enableForking }} || false
+            let enableIssue = ${{ github.event.inputs.enableIssue }}
+            let enableProject = ${{ github.event.inputs.enableProject }}
+            let enableSquashMerge = ${{ github.event.inputs.enableSquashMerge }}
+            let enableForking = ${{ github.event.inputs.enableForking }}
             console.log("Team: " + teams)
             console.log("Enable Issue: " + enableIssue)
             console.log("Enable Project: " + enableProject)
