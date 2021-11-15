@@ -90,11 +90,7 @@ jobs:
                 private: false
               })
             } catch(err) {
-              if (${err}.includes('Name already exists')) {
-                core.error("A repo with this name already exists. Failing workflow run.")
-              } else {
-                core.setFailed("Action failed with error: ${err}");
-              }
+              core.setFailed(`Action failed with error ${err}`);
             }
     outputs:
       org:                ${{ steps.create-github-repo.outputs.org }}
