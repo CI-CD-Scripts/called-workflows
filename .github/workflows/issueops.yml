@@ -27,7 +27,7 @@ jobs:
           github-token: ${{ secrets.ORG_TOKEN }}
           script: |
             bodySplit = context.payload.issue.body.split("\n")
-            # Set vars for this step
+            // Set vars for this step
             let newRepo = bodySplit[2]
             let templateRepo = bodySplit[6]
             let teams = bodySplit[10]
@@ -35,7 +35,7 @@ jobs:
             let enableProject = bodySplit[18].includes("X")
             let enableSquashMerge = bodySplit[22].includes("X")
             let enableForking = bodySplit[26].includes("X")
-            # Set vars for subsequent steps
+            // Set vars for subsequent steps
             core.setOutput('newRepo', newRepo);
             core.setOutput('org', context.payload.organization.login);
             core.setOutput('teams', teams);
@@ -43,7 +43,7 @@ jobs:
             core.setOutput('enableProject', enableProject);
             core.setOutput('enableSquashMerge', enableSquashMerge);
             core.setOutput('enableForking', enableForking);
-            # Print vars to the log
+            // Print vars to the log
             console.log("New repository name: " + bodySplit[2])
             console.log("Template Repository: " + bodySplit[6])
             console.log("Team: " + bodySplit[10])
@@ -92,76 +92,11 @@ jobs:
             } catch(err) {
               core.setFailed(`Action failed with error ${err}`);
             }
-            
-#            console.log("Configuring repo")
-#            try {
-#              await github.rest.repos.update({
-#                owner: context.payload.organization.login,
-#                private: false,
-#                repo: newRepo,
-#                has_issues: enableIssue,
-#                has_projects: enableProject,
-#                allow_squash_merge: enableSquashMerge
-#              })
-#            } catch(err) {
-#              core.setFailed(`Action failed with error ${err}`);
-#            }
-#            
-#            console.log("Updating repo branch permissions")
-#            try {
-#              await github.rest.repos.updateBranchProtection({
-#                "owner": context.payload.organization.login,
-#                "repo": newRepo,
-#                "branch": 'main',
-#                "required_status_checks": { "strict": true, "contexts": [] },
-#                "enforce_admins": true,
-#                "required_pull_request_reviews": {"dismissal_restrictions": {"users":[], "teams":[]}, "dismiss_stale_reviews": false, "require_code_owner_reviews": true, "required_approving_review_count": 1},
-#                "restrictions" : { "users": [], "teams": [], "apps": [] }
-#              })
-#            } catch(err) {
-#              core.setFailed(`Action failed with error ${err}`);
-#            }
-#            
-#            console.log("Setting Team repo permissions")
-#            try {
-#              await github.rest.teams.addOrUpdateRepoPermissionsInOrg({
-#                org: context.payload.organization.login,
-#                owner: context.payload.organization.login,
-#                repo: newRepo,
-#                team_slug: teams,
-#                permission: 'admin'
-#              })
-#            } catch(err) {
-#              core.setFailed(`Action failed with error ${err}`);
-#            }
-#            
-#            console.log("Commenting on issue '" + context.payload.issue.title + "' - " + context.payload.issue.html_url)
-#            try { 
-#              await github.rest.issues.createComment({
-#              issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              body: 'Thanks for creating a repo. Your new repo is available at: https://github.com/' + context.payload.organization.login + "/" + newRepo
-#             }) 
-#            } catch(err) {
-#              core.setFailed(`Action failed with error ${err}`);
-#            }
-#            
-#            console.log("Closing issue")
-#            try {
-#              await github.rest.issues.update({
-#              issue_number: context.issue.number,
-#              owner: context.repo.owner,
-#              repo: context.repo.repo,
-#              state: 'closed'
-#             }) 
-#            } catch(err) {
-#              core.setFailed(`Action failed with error ${err}`);
-#            }
 
   # https://docs.github.com/en/actions/learn-github-actions/reusing-workflows
   Configure-Repo:
     uses: ci-cd-scripts/called-workflows/.github/workflows/configure-repo.yml@main
+    if: contains(github.event.issue.labels.*.name, 'issueops:new-repo')
     needs: Create-Repo
     with:
       org:                ${{ needs.Create-Repo.outputs.org }}
