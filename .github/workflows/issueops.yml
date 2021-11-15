@@ -36,13 +36,13 @@ jobs:
             let enableSquashMerge = bodySplit[22].includes("X")
             let enableForking = bodySplit[26].includes("X")
             // Set vars for subsequent steps
-            core.exportVariable('newRepo', newRepo);
-            core.exportVariable('org', context.payload.organization.login);
-            core.exportVariable('teams', teams);
-            core.exportVariable('enableIssue', enableIssue);
-            core.exportVariable('enableProject', enableProject);
-            core.exportVariable('enableSquashMerge', enableSquashMerge);
-            core.exportVariable('enableForking', enableForking);
+            core.setOutput('newRepo', newRepo);
+            core.setOutput('org', context.payload.organization.login);
+            core.setOutput('teams', teams);
+            core.setOutput('enableIssue', enableIssue);
+            core.setOutput('enableProject', enableProject);
+            core.setOutput('enableSquashMerge', enableSquashMerge);
+            core.setOutput('enableForking', enableForking);
             // Print vars to the log
             console.log("New repository name: " + bodySplit[2])
             console.log("Template Repository: " + bodySplit[6])
