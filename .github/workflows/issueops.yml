@@ -99,12 +99,19 @@ jobs:
 #     if: contains(github.event.issue.labels.*.name, 'issueops:new-repo')
     needs: Create-Repo
     with:
-      org:                ${{ needs.Create-Repo.outputs.org }}
-      repo-name:          ${{ needs.Create-Repo.outputs.newRepo }}
-      teams:              ${{ needs.Create-Repo.outputs.teams }}
-      enableIssue:        ${{ needs.Create-Repo.outputs.enableIssue }}
-      enableProject:      ${{ needs.Create-Repo.outputs.enableProject }}
-      enableSquashMerge:  ${{ needs.Create-Repo.outputs.enableSquashMerge }}
-      enableForking:      ${{ needs.Create-Repo.outputs.enableForking }}
+#       org:                ${{ needs.Create-Repo.outputs.org }}
+#       repo-name:          ${{ needs.Create-Repo.outputs.newRepo }}
+#       teams:              ${{ needs.Create-Repo.outputs.teams }}
+#       enableIssue:        ${{ needs.Create-Repo.outputs.enableIssue }}
+#       enableProject:      ${{ needs.Create-Repo.outputs.enableProject }}
+#       enableSquashMerge:  ${{ needs.Create-Repo.outputs.enableSquashMerge }}
+#       enableForking:      ${{ needs.Create-Repo.outputs.enableForking }}
+      org:               'ci-cd-scripts'
+      repo-name:         'test-6'
+      teams:             'team-a,team-b'
+      enableIssue:       false
+      enableProject:     false
+      enableSquashMerge: false
+      enableForking:     false
     secrets:
       caller-token: ${{ secrets.ORG_TOKEN }}
