@@ -5,7 +5,7 @@ on:
     types: [opened]
 
 jobs:
-  Create-Repo:
+  create-repo:
     runs-on: ubuntu-latest
     environment: ci-cd-scripts
     if: contains(github.event.issue.labels.*.name, 'issueops:new-repo')
@@ -36,13 +36,13 @@ jobs:
             let enableSquashMerge = bodySplit[22].includes("X")
             let enableForking = bodySplit[26].includes("X")
             // Set vars for subsequent steps
-            core.setOutput('newRepo', newRepo);
-            core.setOutput('org', context.payload.organization.login);
-            core.setOutput('teams', teams);
-            core.setOutput('enableIssue', enableIssue);
-            core.setOutput('enableProject', enableProject);
-            core.setOutput('enableSquashMerge', enableSquashMerge);
-            core.setOutput('enableForking', enableForking);
+            core.exportVariable('newRepo', newRepo);
+            core.exportVariable('org', context.payload.organization.login);
+            core.exportVariable('teams', teams);
+            core.exportVariable('enableIssue', enableIssue);
+            core.exportVariable('enableProject', enableProject);
+            core.exportVariable('enableSquashMerge', enableSquashMerge);
+            core.exportVariable('enableForking', enableForking);
             // Print vars to the log
             console.log("New repository name: " + bodySplit[2])
             console.log("Template Repository: " + bodySplit[6])
@@ -96,36 +96,27 @@ jobs:
                 core.setFailed("Action failed with error: ${err}");
               }
             }
-  
-  debug-job:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Print Context
-        uses: actions/github-script@v5
-        with:
-          script: |
-            console.log(context)
-            console.log(needs)
+    outputs:
+      org:                ${{ steps.create-github-repo.outputs.org }}
+      repo-name:          ${{ steps.create-github-repo.outputs.newRepo }}
+      teams:              ${{ steps.create-github-repo.outputs.teams }}
+      enableIssue:        ${{ steps.create-github-repo.outputs.enableIssue }}
+      enableProject:      ${{ steps.create-github-repo.outputs.enableProject }}
+      enableSquashMerge:  ${{ steps.create-github-repo.outputs.enableSquashMerge }}
+      enableForking:      ${{ steps.create-github-repo.outputs.enableForking }}
 
   # https://docs.github.com/en/actions/learn-github-actions/reusing-workflows
-  Configure-Repo:
+  configure-repo:
     uses: ci-cd-scripts/called-workflows/.github/workflows/configure-repo.yml@main
-#     if: contains(github.event.issue.labels.*.name, 'issueops:new-repo')
-    needs: Create-Repo
+    if: contains(github.event.issue.labels.*.name, 'issueops:new-repo')
+    needs: create-repo
     with:
-#       org:                ${{ needs.Create-Repo.outputs.org }}
-#       repo-name:          ${{ needs.Create-Repo.outputs.newRepo }}
-#       teams:              ${{ needs.Create-Repo.outputs.teams }}
-#       enableIssue:        ${{ needs.Create-Repo.outputs.enableIssue }}
-#       enableProject:      ${{ needs.Create-Repo.outputs.enableProject }}
-#       enableSquashMerge:  ${{ needs.Create-Repo.outputs.enableSquashMerge }}
-#       enableForking:      ${{ needs.Create-Repo.outputs.enableForking }}
-      org:               'ci-cd-scripts'
-      repo-name:         'test-6'
-      teams:             'team-a,team-b'
-      enableIssue:       false
-      enableProject:     false
-      enableSquashMerge: false
-      enableForking:     false
+      org:                ${{ needs.create-repo.outputs.org }}
+      repo-name:          ${{ needs.create-repo.outputs.newRepo }}
+      teams:              ${{ needs.create-repo.outputs.teams }}
+      enableIssue:        ${{ needs.create-repo.outputs.enableIssue }}
+      enableProject:      ${{ needs.create-repo.outputs.enableProject }}
+      enableSquashMerge:  ${{ needs.create-repo.outputs.enableSquashMerge }}
+      enableForking:      ${{ needs.create-repo.outputs.enableForking }}
     secrets:
       caller-token: ${{ secrets.ORG_TOKEN }}
