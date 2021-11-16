@@ -35,7 +35,7 @@ body:
     id: team-slug
     attributes:
       label: Team Permission
-      description: Type in the team that you want to apply the admin permission
+      description: Type in the team that you want to provide repo access to (default: Read access)
       placeholder: ex. Avengers
     validations:
       required: false
@@ -75,3 +75,15 @@ body:
       options:
         - label: Yes, I want to allow forking
           required: false
+      
+  - type: checkboxes
+    id: team-access-groups
+    attributes:
+      label: Team Access Configured
+      description: Check the Access options you have AD Groups created for
+      options:
+        - label: Read
+        - label: Triage
+        - label: Write
+        - label: Maintain
+        - label: Admin
