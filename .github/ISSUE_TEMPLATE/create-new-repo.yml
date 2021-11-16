@@ -35,7 +35,7 @@ body:
     id: team-slug
     attributes:
       label: Team Permission
-      description: Type in the team that you want to provide repo access to (default: Read access)
+      description: "Type in the team that you want to provide repo access to (default: Read access)"
       placeholder: ex. Avengers
     validations:
       required: false
