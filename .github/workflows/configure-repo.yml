@@ -34,10 +34,6 @@ on:
         description: 'Enable Repo Forking?'
         required: true
         type: boolean
-    secrets:
-      caller-token:
-        description: 'A token passed from the caller workflow'
-        required: true
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
