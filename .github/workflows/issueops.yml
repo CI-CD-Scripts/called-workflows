@@ -114,5 +114,3 @@ jobs:
       enableProject:      ${{ needs.create-repo.outputs.enableProject }}
       enableSquashMerge:  ${{ needs.create-repo.outputs.enableSquashMerge }}
       enableForking:      ${{ needs.create-repo.outputs.enableForking }}
-    secrets:
-      caller-token: ${{ secrets.ORG_TOKEN }}
