@@ -67,7 +67,7 @@ on:
 jobs:
   Configure-Repo:
     runs-on: ubuntu-latest
-    environment: ci-cd-scripts
+    environment: ${{ github.event.inputs.org }}
     steps:
         
       - name: Print Context
@@ -79,7 +79,7 @@ jobs:
       - name: Configure GitHub repo
         uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.caller-token }}
+          github-token: ${{ secrets.ORG_TOKEN }}
           script: |
             let teams = "org-admin,org-read,${{ github.event.inputs.enableIssue }}".toLowerCase().replaceAll(' ','-')
             let enableIssue = ${{ github.event.inputs.enableIssue }}
