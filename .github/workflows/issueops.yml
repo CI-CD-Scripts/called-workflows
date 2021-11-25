@@ -2,7 +2,7 @@
 name: Create repository with IssueOps
 on:
   issues:
-    types: [opened]
+    types: [opened, demilestoned]
 
 jobs:
   create-repo:
