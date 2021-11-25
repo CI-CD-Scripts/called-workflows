@@ -21,19 +21,19 @@ on:
       enableIssue:
         description: 'Enable Repo Issues?'
         required: true
-        type: boolean
+        type: string
       enableProject:
         description: 'Enable Repo Projects?'
         required: true
-        type: boolean
+        type: string
       enableSquashMerge:
         description: 'Enable Repo Squash Merging?'
         required: true
-        type: boolean
+        type: string
       enableForking:
         description: 'Enable Repo Forking?'
         required: true
-        type: boolean
+        type: string
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
