@@ -34,6 +34,9 @@ on:
         description: 'Enable Repo Forking?'
         required: true
         type: string
+    secrets:
+      caller-token:
+        required: true
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
@@ -75,9 +78,9 @@ jobs:
       - name: Configure GitHub repo
         uses: actions/github-script@v5
         with:
-          github-token: ${{ secrets.ORG_TOKEN }}
+          github-token: ${{ secrets.caller-token }}
           script: |
-            let teams = "org-admin,org-read,${{ github.event.inputs.enableIssue }}".toLowerCase().replaceAll(' ','-')
+            let teams = "org-admin,org-read,${{ github.event.inputs.teams }}".toLowerCase().replaceAll(' ','-')
             let enableIssue = ${{ github.event.inputs.enableIssue }}
             let enableProject = ${{ github.event.inputs.enableProject }}
             let enableSquashMerge = ${{ github.event.inputs.enableSquashMerge }}
