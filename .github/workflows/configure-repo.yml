@@ -101,7 +101,7 @@ jobs:
           github-token: ${{ secrets.caller-token }}
           script: |
             let repoName = ${{ inputs.repoName }}
-            let teams = "org-admin,org-read,${{ inputs.teams }}".toLowerCase().replaceAll(' ','-')
+            let teams = "org-admin,org-read,${{ inputs.teams }}".toLowerCase().replace('/ /g','-')
             let enableIssue = ${{ inputs.enableIssue }}
             let enableProject = ${{ inputs.enableProject }}
             let enableSquashMerge = ${{ inputs.enableSquashMerge }}
@@ -142,7 +142,7 @@ jobs:
             }
             
             console.log("Setting Team repo permissions")
-            for await (const team of teams.split(",") {
+            for await (const team of teams.split(",")) {
               if (team.includes('admin')) {
                 let permission = 'admin'
               } else if (team.includes('maintain')) {
