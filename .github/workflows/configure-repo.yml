@@ -143,16 +143,15 @@ jobs:
             
             console.log("Setting Team repo permissions")
             for await (const team of teams.split(",")) {
+              var permission = 'pull'
               if (team.includes('admin')) {
-                let permission = 'admin'
+                permission = 'admin'
               } else if (team.includes('maintain')) {
-                let permission = 'maintain'
+                permission = 'maintain'
               } else if (team.includes('write')) {
-                let permission = 'push'
+                permission = 'push'
               } else if (team.includes('triage')) {
-                let permission = 'triage'
-              } else {
-                let permission = 'pull'
+                permission = 'triage'
               }
               console.log("Team: [" + team + "] - Permission: [" + permission + "]")
               try {
