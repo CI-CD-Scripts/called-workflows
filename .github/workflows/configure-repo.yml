@@ -148,12 +148,13 @@ jobs:
               } else if (team.includes('maintain')) {
                 let permission = 'maintain'
               } else if (team.includes('write')) {
-                let permission = 'write'
+                let permission = 'push'
               } else if (team.includes('triage')) {
                 let permission = 'triage'
               } else {
-                let permission = 'read'
+                let permission = 'pull'
               }
+              console.log("Team: [" + team + "] - Permission: [" + permission + "]")
               try {
                 await github.rest.teams.addOrUpdateRepoPermissionsInOrg({
                   org: context.payload.organization.login,
