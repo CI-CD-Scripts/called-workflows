@@ -100,7 +100,7 @@ jobs:
         with:
           github-token: ${{ secrets.caller-token }}
           script: |
-            let repoName = ${{ inputs.repoName }}
+            let repoName = "${{ inputs.repoName }}"
             let teams = "org-admin,org-read,${{ inputs.teams }}".toLowerCase().replace('/ /g','-')
             let enableIssue = ${{ inputs.enableIssue }}
             let enableProject = ${{ inputs.enableProject }}
