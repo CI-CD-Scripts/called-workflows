@@ -5,6 +5,15 @@ on:
     types: [opened, demilestoned]
 
 jobs:
+  debug:
+    runs-on: ubuntu-latest
+    environment: ci-cd-scripts
+    steps:
+      - name: Print Context
+        uses: actions/github-script@v5
+        with:
+          script: |
+            console.log(context)
   create-repo:
     runs-on: ubuntu-latest
     environment: ci-cd-scripts
