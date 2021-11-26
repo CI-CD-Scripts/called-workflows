@@ -101,7 +101,7 @@ jobs:
           github-token: ${{ secrets.caller-token }}
           script: |
             let repoName = "${{ inputs.repoName }}"
-            let teams = "org-admin,org-read,${{ inputs.teams }}".toLowerCase().replace('/ /g','-')
+            let teams = "org-admin,org-read,${{ inputs.teams }}".toLowerCase().split(' ').join('-')
             let enableIssue = ${{ inputs.enableIssue }}
             let enableProject = ${{ inputs.enableProject }}
             let enableSquashMerge = ${{ inputs.enableSquashMerge }}
