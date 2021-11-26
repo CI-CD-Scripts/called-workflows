@@ -106,6 +106,13 @@ jobs:
     needs: create-repo
     runs-on: ubuntu-latest
     steps:
+    
+    - name: Dump GitHub context
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+      run: |
+        echo "$GITHUB_CONTEXT"
+        
     - name: Validate job outputs
       run: |
         echo "org: [${{ needs.create-repo.outputs.org }}]"
