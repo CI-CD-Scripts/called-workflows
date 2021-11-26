@@ -76,13 +76,13 @@ jobs:
         
     - name: Validate job outputs
       run: |
-        echo "org: [${{ github.event.inputs.org }}]"
-        echo "repoName: [${{ github.event.inputs.repoName }}]"
-        echo "teams: [${{ github.event.inputs.teams }}]"
-        echo "enableIssue: [${{ github.event.inputs.enableIssue }}]"
-        echo "enableProject: [${{ github.event.inputs.enableProject }}]"
-        echo "enableSquashMerge: [${{ github.event.inputs.enableSquashMerge }}]"
-        echo "enableForking: [${{ github.event.inputs.enableForking }}]"
+        echo "org: [${{ inputs.org }}]"
+        echo "repoName: [${{ inputs.repoName }}]"
+        echo "teams: [${{ inputs.teams }}]"
+        echo "enableIssue: [${{ inputs.enableIssue }}]"
+        echo "enableProject: [${{ inputs.enableProject }}]"
+        echo "enableSquashMerge: [${{ inputs.enableSquashMerge }}]"
+        echo "enableForking: [${{ inputs.enableForking }}]"
 
   Configure-Repo:
     runs-on: ubuntu-latest
@@ -100,12 +100,12 @@ jobs:
         with:
           github-token: ${{ secrets.caller-token }}
           script: |
-            let repoName = ${{ github.event.inputs.repoName }}
-            let teams = "org-admin,org-read,${{ github.event.inputs.teams }}".toLowerCase().replaceAll(' ','-')
-            let enableIssue = ${{ github.event.inputs.enableIssue }}
-            let enableProject = ${{ github.event.inputs.enableProject }}
-            let enableSquashMerge = ${{ github.event.inputs.enableSquashMerge }}
-            let enableForking = ${{ github.event.inputs.enableForking }}
+            let repoName = ${{ inputs.repoName }}
+            let teams = "org-admin,org-read,${{ inputs.teams }}".toLowerCase().replaceAll(' ','-')
+            let enableIssue = ${{ inputs.enableIssue }}
+            let enableProject = ${{ inputs.enableProject }}
+            let enableSquashMerge = ${{ inputs.enableSquashMerge }}
+            let enableForking = ${{ inputs.enableForking }}
             console.log("Team: " + teams)
             console.log("Enable Issue: " + enableIssue)
             console.log("Enable Project: " + enableProject)
