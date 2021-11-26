@@ -101,6 +101,21 @@ jobs:
       enableSquashMerge:  ${{ steps.create-github-repo.outputs.enableSquashMerge }}
       enableForking:      ${{ steps.create-github-repo.outputs.enableForking }}
 
+  debug:
+    if: contains(github.event.issue.labels.*.name, 'issueops:new-repo')
+    needs: create-repo
+    runs-on: ubuntu-latest
+    steps:
+    - name: Validate job outputs
+      run: |
+        echo "org: [${{ needs.create-repo.outputs.org }}]"
+        echo "newRepo: [${{ needs.create-repo.outputs.newRepo }}]"
+        echo "teams: [${{ needs.create-repo.outputs.teams }}]"
+        echo "enableIssue: [${{ needs.create-repo.outputs.enableIssue }}]"
+        echo "enableProject: [${{ needs.create-repo.outputs.enableProject }}]"
+        echo "enableSquashMerge: [${{ needs.create-repo.outputs.enableSquashMerge }}]"
+        echo "enableForking: [${{ needs.create-repo.outputs.enableForking }}]"
+
   # https://docs.github.com/en/actions/learn-github-actions/reusing-workflows
   configure-repo:
     uses: ci-cd-scripts/called-workflows/.github/workflows/configure-repo.yml@main
