@@ -28,7 +28,7 @@ jobs:
           script: |
             bodySplit = context.payload.issue.body.split("\n")
             // Set vars for this step
-            let newRepo = bodySplit[2]
+            let repoName = bodySplit[2]
             let templateRepo = bodySplit[6]
             let teams = bodySplit[10]
             let enableIssue = bodySplit[14].includes("X")
@@ -36,7 +36,7 @@ jobs:
             let enableSquashMerge = bodySplit[22].includes("X")
             let enableForking = bodySplit[26].includes("X")
             // Set vars for subsequent steps
-            core.setOutput('newRepo', newRepo);
+            core.setOutput('repoName', repoName);
             core.setOutput('org', context.payload.organization.login);
             core.setOutput('teams', teams);
             core.setOutput('enableIssue', enableIssue);
@@ -52,7 +52,7 @@ jobs:
             console.log("Allow Squash Merge: " +  bodySplit[22].includes("X"))
             console.log("Allow Forking: " +  bodySplit[26].includes("X"))
             
-            console.log("New repo: " + newRepo + " Template Repo: " + templateRepo + " Teams: " + teams)
+            console.log("New repo: " + repoName + " Template Repo: " + templateRepo + " Teams: " + teams)
             
             console.log("Commenting on issue '" + context.payload.issue.title + "' - " + context.payload.issue.html_url)
             try { 
@@ -83,7 +83,7 @@ jobs:
               await github.rest.repos.createUsingTemplate({
                 template_owner: context.payload.organization.login,
                 template_repo: templateRepo,
-                name: newRepo,
+                name: repoName,
                 owner: context.payload.organization.login,
                 description: "Test",
                 include_all_branches: true,
@@ -94,7 +94,7 @@ jobs:
             }
     outputs:
       org:                ${{ steps.create-github-repo.outputs.org }}
-      repo-name:          ${{ steps.create-github-repo.outputs.newRepo }}
+      repoName:           ${{ steps.create-github-repo.outputs.repoName }}
       teams:              ${{ steps.create-github-repo.outputs.teams }}
       enableIssue:        ${{ steps.create-github-repo.outputs.enableIssue }}
       enableProject:      ${{ steps.create-github-repo.outputs.enableProject }}
@@ -116,7 +116,7 @@ jobs:
     - name: Validate job outputs
       run: |
         echo "org: [${{ needs.create-repo.outputs.org }}]"
-        echo "newRepo: [${{ needs.create-repo.outputs.newRepo }}]"
+        echo "repoName: [${{ needs.create-repo.outputs.repoName }}]"
         echo "teams: [${{ needs.create-repo.outputs.teams }}]"
         echo "enableIssue: [${{ needs.create-repo.outputs.enableIssue }}]"
         echo "enableProject: [${{ needs.create-repo.outputs.enableProject }}]"
@@ -130,7 +130,7 @@ jobs:
     needs: create-repo
     with:
       org:                ${{ needs.create-repo.outputs.org }}
-      repo-name:          ${{ needs.create-repo.outputs.newRepo }}
+      repoName:           ${{ needs.create-repo.outputs.repoName }}
       teams:              ${{ needs.create-repo.outputs.teams }}
       enableIssue:        ${{ needs.create-repo.outputs.enableIssue }}
       enableProject:      ${{ needs.create-repo.outputs.enableProject }}
