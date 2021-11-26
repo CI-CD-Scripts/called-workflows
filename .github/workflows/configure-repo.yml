@@ -64,15 +64,25 @@ on:
         required: true
 
 jobs:
-  printJob:    
-    name: Print event
+  debug:
     runs-on: ubuntu-latest
     steps:
+    
     - name: Dump GitHub context
       env:
         GITHUB_CONTEXT: ${{ toJson(github) }}
       run: |
         echo "$GITHUB_CONTEXT"
+        
+    - name: Validate job outputs
+      run: |
+        echo "org: [${{ github.event.inputs.org }}]"
+        echo "repoName: [${{ github.event.inputs.repoName }}]"
+        echo "teams: [${{ github.event.inputs.teams }}]"
+        echo "enableIssue: [${{ github.event.inputs.enableIssue }}]"
+        echo "enableProject: [${{ github.event.inputs.enableProject }}]"
+        echo "enableSquashMerge: [${{ github.event.inputs.enableSquashMerge }}]"
+        echo "enableForking: [${{ github.event.inputs.enableForking }}]"
 
   Configure-Repo:
     runs-on: ubuntu-latest
